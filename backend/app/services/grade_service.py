@@ -1,6 +1,18 @@
 from ..extensions import db
 from ..models import Grade, Student
-from .gpa import calculate_summary
+from .gpa import calculate_summary, enrich_grade_gpa
+from .appeal_service import enrich_grade_appeal_status
+
+
+def build_grade_view(grade):
+    data = grade.to_dict()
+    enrich_grade_gpa(data)
+    enrich_grade_appeal_status(data, grade)
+    return data
+
+
+def build_grade_views(grades):
+    return [build_grade_view(grade) for grade in grades]
 
 
 def list_grades():
@@ -71,5 +83,5 @@ def get_transcript(student_no):
     return {
         "student": student.to_dict(),
         "summary": calculate_summary(grades),
-        "grades": [grade.to_dict() for grade in grades],
+        "grades": build_grade_views(grades),
     }

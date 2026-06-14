@@ -1,47 +1,38 @@
-def score_to_point(score):
+GPA_RULES = [
+    (90, 4.0, "A"),
+    (85, 3.7, "A-"),
+    (82, 3.3, "B+"),
+    (78, 3.0, "B"),
+    (75, 2.7, "B-"),
+    (72, 2.3, "C+"),
+    (68, 2.0, "C"),
+    (64, 1.5, "C-"),
+    (60, 1.0, "D"),
+    (0, 0.0, "F"),
+]
+
+
+def _match_rule(score):
     score = float(score)
-    if score >= 90:
-        return 4.0
-    if score >= 85:
-        return 3.7
-    if score >= 82:
-        return 3.3
-    if score >= 78:
-        return 3.0
-    if score >= 75:
-        return 2.7
-    if score >= 72:
-        return 2.3
-    if score >= 68:
-        return 2.0
-    if score >= 64:
-        return 1.5
-    if score >= 60:
-        return 1.0
-    return 0.0
+    for threshold, point, letter in GPA_RULES:
+        if score >= threshold:
+            return point, letter
+    return 0.0, "F"
+
+
+def score_to_point(score):
+    return _match_rule(score)[0]
 
 
 def score_to_letter(score):
-    score = float(score)
-    if score >= 90:
-        return "A"
-    if score >= 85:
-        return "A-"
-    if score >= 82:
-        return "B+"
-    if score >= 78:
-        return "B"
-    if score >= 75:
-        return "B-"
-    if score >= 72:
-        return "C+"
-    if score >= 68:
-        return "C"
-    if score >= 64:
-        return "C-"
-    if score >= 60:
-        return "D"
-    return "F"
+    return _match_rule(score)[1]
+
+
+def enrich_grade_gpa(grade_dict):
+    score = grade_dict["score"]
+    grade_dict["gpaPoint"] = score_to_point(score)
+    grade_dict["letter"] = score_to_letter(score)
+    return grade_dict
 
 
 def calculate_summary(grades):

@@ -5,6 +5,18 @@ from ..models import Appeal, Grade
 VALID_STATUSES = {"pending", "approved", "rejected"}
 
 
+def get_latest_appeal_status(grade):
+    if not grade.appeals:
+        return None
+    latest = max(grade.appeals, key=lambda a: a.created_at)
+    return latest.status
+
+
+def enrich_grade_appeal_status(grade_dict, grade):
+    grade_dict["appealStatus"] = get_latest_appeal_status(grade)
+    return grade_dict
+
+
 def create_appeal(payload):
     grade = Grade.query.get(payload["gradeId"])
     if not grade:

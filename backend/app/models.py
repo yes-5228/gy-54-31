@@ -39,9 +39,6 @@ class Grade(db.Model):
     appeals = db.relationship("Appeal", back_populates="grade", cascade="all, delete-orphan")
 
     def to_dict(self):
-        from .services.gpa import score_to_letter, score_to_point
-
-        latest_appeal = sorted(self.appeals, key=lambda appeal: appeal.created_at, reverse=True)
         return {
             "id": self.id,
             "student": self.student.to_dict(),
@@ -49,11 +46,8 @@ class Grade(db.Model):
             "courseName": self.course_name,
             "credit": self.credit,
             "score": self.score,
-            "gpaPoint": score_to_point(self.score),
-            "letter": score_to_letter(self.score),
             "semester": self.semester,
             "teacher": self.teacher,
-            "appealStatus": latest_appeal[0].status if latest_appeal else None,
             "createdAt": self.created_at.isoformat(),
             "updatedAt": self.updated_at.isoformat(),
         }

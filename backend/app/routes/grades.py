@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from ..models import Grade
-from ..services.grade_service import create_grade, list_grades, update_grade
+from ..services.grade_service import build_grade_view, build_grade_views, create_grade, list_grades, update_grade
 from ..utils.validation import require_fields, validate_score
 
 grades_bp = Blueprint("grades", __name__)
@@ -9,7 +9,7 @@ grades_bp = Blueprint("grades", __name__)
 
 @grades_bp.get("")
 def index():
-    return jsonify([grade.to_dict() for grade in list_grades()])
+    return jsonify(build_grade_views(list_grades()))
 
 
 @grades_bp.post("")
@@ -27,7 +27,7 @@ def create():
         return jsonify({"message": error}), 400
 
     grade = create_grade(payload)
-    return jsonify(grade.to_dict()), 201
+    return jsonify(build_grade_view(grade)), 201
 
 
 @grades_bp.put("/<int:grade_id>")
@@ -39,4 +39,4 @@ def update(grade_id):
         if error:
             return jsonify({"message": error}), 400
 
-    return jsonify(update_grade(grade, payload).to_dict())
+    return jsonify(build_grade_view(update_grade(grade, payload)))
