@@ -143,8 +143,36 @@ button:disabled {
 .panel-head {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-content: space-between;
   margin-bottom: 16px;
+}
+
+.rule-switch {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.rule-label {
+  color: #64748b;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.rule-current {
+  color: #1f7a6d;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rule-switch select {
+  font-size: 13px;
+  min-height: 32px;
+  padding: 4px 8px;
+  width: auto;
 }
 
 .split-grid {

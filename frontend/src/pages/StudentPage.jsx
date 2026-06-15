@@ -1,5 +1,5 @@
 import { FilePlus2, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../api/client";
 import GradeTable from "../components/GradeTable";
 import Notice from "../components/Notice";
@@ -9,16 +9,34 @@ export default function StudentPage() {
   const [transcript, setTranscript] = useState(null);
   const [appealForm, setAppealForm] = useState({ gradeId: "", reason: "" });
   const [notice, setNotice] = useState(null);
+  const [gpaRules, setGpaRules] = useState([]);
+  const [selectedRule, setSelectedRule] = useState(null);
 
-  const search = async (event) => {
-    event.preventDefault();
+  useEffect(() => {
+    api.listGpaRules().then(setGpaRules).catch(() => {});
+  }, []);
+
+  const loadTranscript = async (rule) => {
     try {
-      setTranscript(await api.getTranscript(studentNo));
+      const data = await api.getTranscript(studentNo, rule || undefined);
+      setTranscript(data);
+      setSelectedRule(data.ruleKey);
       setNotice(null);
     } catch (error) {
       setTranscript(null);
       setNotice({ type: "error", message: error.message });
     }
+  };
+
+  const search = async (event) => {
+    event.preventDefault();
+    setSelectedRule(null);
+    await loadTranscript(null);
+  };
+
+  const switchRule = async (rule) => {
+    setSelectedRule(rule);
+    await loadTranscript(rule);
   };
 
   const submitAppeal = async (event) => {
@@ -27,7 +45,7 @@ export default function StudentPage() {
       await api.createAppeal({ ...appealForm, gradeId: Number(appealForm.gradeId), studentNo });
       setNotice({ type: "success", message: "申诉已提交" });
       setAppealForm({ gradeId: "", reason: "" });
-      setTranscript(await api.getTranscript(studentNo));
+      await loadTranscript(selectedRule);
     } catch (error) {
       setNotice({ type: "error", message: error.message });
     }
@@ -80,6 +98,19 @@ export default function StudentPage() {
             <div className="panel">
               <div className="panel-head">
                 <h2>成绩单</h2>
+                <div className="rule-switch">
+                  <span className="rule-label">绩点标准：</span>
+                  <span className="rule-current">{transcript.ruleName}</span>
+                  {gpaRules.length > 1 && (
+                    <select value={selectedRule || ""} onChange={(event) => switchRule(event.target.value)}>
+                      {gpaRules.map((r) => (
+                        <option key={r.key} value={r.key}>
+                          {r.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
               </div>
               <GradeTable compact grades={transcript.grades} />
             </div>
@@ -92,8 +123,8 @@ export default function StudentPage() {
                 <select value={appealForm.gradeId} onChange={(event) => setAppealForm((current) => ({ ...current, gradeId: event.target.value }))} required>
                   <option value="">选择课程</option>
                   {transcript.grades.map((grade) => (
-                    <option key={grade.id} value={grade.id}>
-                      {grade.courseName} - {grade.score} 分
+                    <option key={grade.basic.id} value={grade.basic.id}>
+                      {grade.basic.courseName} - {grade.basic.score} 分
                     </option>
                   ))}
                 </select>

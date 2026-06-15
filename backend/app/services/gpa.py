@@ -120,13 +120,6 @@ def score_to_letter(score, rule_name=None):
     return _match_rule(score, rule_name)[1]
 
 
-def enrich_grade_gpa(grade_dict, rule_name=None):
-    score = grade_dict["score"]
-    grade_dict["gpaPoint"] = score_to_point(score, rule_name)
-    grade_dict["letter"] = score_to_letter(score, rule_name)
-    return grade_dict
-
-
 def calculate_summary(grades, rule_name=None):
     total_credit = sum(grade.credit for grade in grades)
     weighted_points = sum(grade.credit * score_to_point(grade.score, rule_name) for grade in grades)

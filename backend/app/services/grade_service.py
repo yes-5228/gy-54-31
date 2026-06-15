@@ -4,53 +4,41 @@ from .gpa import (
     GPA_RULES,
     calculate_summary,
     DEFAULT_RULE,
-    enrich_grade_gpa,
     resolve_rule_name,
+    score_to_letter,
+    score_to_point,
 )
-from .appeal_service import enrich_grade_appeal_status, get_latest_appeal_status
+from .appeal_service import get_latest_appeal_status
 
 
 def build_grade_view(grade, rule_name=None):
     college = grade.student.college
     resolved_rule = resolve_rule_name(college=college, rule_name=rule_name)
     rule_meta = GPA_RULES.get(resolved_rule, GPA_RULES[DEFAULT_RULE])
-    rule_display = rule_meta["name"]
 
-    data = grade.to_dict()
-
-    enrich_grade_gpa(data, resolved_rule)
-    enrich_grade_appeal_status(data, grade)
-
-    basic = {
-        "id": data["id"],
-        "student": data["student"],
-        "courseCode": data["courseCode"],
-        "courseName": data["courseName"],
-        "credit": data["credit"],
-        "score": data["score"],
-        "semester": data["semester"],
-        "teacher": data["teacher"],
-        "createdAt": data["createdAt"],
-        "updatedAt": data["updatedAt"],
+    return {
+        "basic": {
+            "id": grade.id,
+            "student": grade.student.to_dict(),
+            "courseCode": grade.course_code,
+            "courseName": grade.course_name,
+            "credit": grade.credit,
+            "score": grade.score,
+            "semester": grade.semester,
+            "teacher": grade.teacher,
+            "createdAt": grade.created_at.isoformat(),
+            "updatedAt": grade.updated_at.isoformat(),
+        },
+        "gpa": {
+            "ruleKey": resolved_rule,
+            "ruleName": rule_meta["name"],
+            "point": score_to_point(grade.score, resolved_rule),
+            "letter": score_to_letter(grade.score, resolved_rule),
+        },
+        "appeal": {
+            "status": get_latest_appeal_status(grade),
+        },
     }
-
-    gpa = {
-        "ruleKey": resolved_rule,
-
-        "ruleName": rule_display,
-        "point": data["gpaPoint"],
-        "letter": data["letter"],
-    }
-
-    appeal = {
-        "status": get_latest_appeal_status(grade),
-    }
-
-    data["basic"] = basic
-    data["gpa"] = gpa
-    data["appeal"] = appeal
-
-    return data
 
 
 def build_grade_views(grades, rule_name=None):

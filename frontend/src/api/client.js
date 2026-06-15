@@ -29,7 +29,11 @@ export const api = {
       method: "PUT",
       body: JSON.stringify(payload),
     }),
-  getTranscript: (studentNo) => request(`/students/${studentNo}/transcript`),
+  getTranscript: (studentNo, rule) => {
+    const params = rule ? `?rule=${encodeURIComponent(rule)}` : "";
+    return request(`/students/${studentNo}/transcript${params}`);
+  },
+  listGpaRules: () => request("/gpa/rules"),
   listAppeals: () => request("/appeals"),
   createAppeal: (payload) =>
     request("/appeals", {

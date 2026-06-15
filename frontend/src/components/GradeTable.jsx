@@ -27,15 +27,15 @@ export default function GradeTable({ grades, compact = false, onScoreChange }) {
         </thead>
         <tbody>
           {grades.map((grade) => (
-            <tr key={grade.id}>
-              {!compact && <td>{grade.student.studentNo}</td>}
-              {!compact && <td>{grade.student.name}</td>}
+            <tr key={grade.basic.id}>
+              {!compact && <td>{grade.basic.student.studentNo}</td>}
+              {!compact && <td>{grade.basic.student.name}</td>}
               <td>
-                <strong>{grade.courseName}</strong>
-                <span>{grade.courseCode}</span>
+                <strong>{grade.basic.courseName}</strong>
+                <span>{grade.basic.courseCode}</span>
               </td>
-              <td>{grade.semester}</td>
-              <td>{grade.credit}</td>
+              <td>{grade.basic.semester}</td>
+              <td>{grade.basic.credit}</td>
               <td>
                 {onScoreChange ? (
                   <input
@@ -43,18 +43,18 @@ export default function GradeTable({ grades, compact = false, onScoreChange }) {
                     min="0"
                     max="100"
                     type="number"
-                    value={grade.score}
-                    onChange={(event) => onScoreChange(grade.id, event.target.value)}
+                    value={grade.basic.score}
+                    onChange={(event) => onScoreChange(grade.basic.id, event.target.value)}
                   />
                 ) : (
-                  grade.score
+                  grade.basic.score
                 )}
               </td>
-              <td>{grade.gpaPoint.toFixed(1)}</td>
-              <td>{grade.letter}</td>
+              <td>{grade.gpa.point.toFixed(1)}</td>
+              <td>{grade.gpa.letter}</td>
               <td>
-                {grade.appealStatus ? (
-                  <span className={`status ${grade.appealStatus}`}>{statusMap[grade.appealStatus]}</span>
+                {grade.appeal.status ? (
+                  <span className={`status ${grade.appeal.status}`}>{statusMap[grade.appeal.status]}</span>
                 ) : (
                   <span className="muted">无</span>
                 )}

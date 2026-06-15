@@ -7,6 +7,7 @@ import Notice from "../components/Notice";
 const initialForm = {
   studentNo: "",
   studentName: "",
+  college: "",
   major: "",
   className: "",
   courseCode: "",
@@ -51,10 +52,14 @@ export default function TeacherPage() {
   };
 
   const changeScore = async (gradeId, score) => {
-    setGrades((items) => items.map((item) => (item.id === gradeId ? { ...item, score: Number(score) } : item)));
+    setGrades((items) =>
+      items.map((item) =>
+        item.basic.id === gradeId ? { ...item, basic: { ...item.basic, score: Number(score) } } : item
+      )
+    );
     try {
       const updated = await api.updateGrade(gradeId, { score });
-      setGrades((items) => items.map((item) => (item.id === gradeId ? updated : item)));
+      setGrades((items) => items.map((item) => (item.basic.id === gradeId ? updated : item)));
     } catch (error) {
       setNotice({ type: "error", message: error.message });
       await loadGrades();
@@ -83,6 +88,10 @@ export default function TeacherPage() {
             <input value={form.studentName} onChange={(event) => updateField("studentName", event.target.value)} required />
           </label>
           <label>
+            学院
+            <input value={form.college} onChange={(event) => updateField("college", event.target.value)} />
+          </label>
+          <label>
             专业
             <input value={form.major} onChange={(event) => updateField("major", event.target.value)} />
           </label>
@@ -105,10 +114,6 @@ export default function TeacherPage() {
           <label>
             成绩
             <input min="0" max="100" type="number" value={form.score} onChange={(event) => updateField("score", event.target.value)} required />
-          </label>
-          <label>
-            学期
-            <input value={form.semester} onChange={(event) => updateField("semester", event.target.value)} required />
           </label>
           <label>
             任课教师
