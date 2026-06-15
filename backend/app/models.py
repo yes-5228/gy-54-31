@@ -7,6 +7,7 @@ class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_no = db.Column(db.String(32), unique=True, nullable=False, index=True)
     name = db.Column(db.String(80), nullable=False)
+    college = db.Column(db.String(120), default="")
     major = db.Column(db.String(120), default="")
     class_name = db.Column(db.String(120), default="")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -18,6 +19,7 @@ class Student(db.Model):
             "id": self.id,
             "studentNo": self.student_no,
             "name": self.name,
+            "college": self.college,
             "major": self.major,
             "className": self.class_name,
         }

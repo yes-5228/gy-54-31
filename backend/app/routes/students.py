@@ -17,7 +17,8 @@ def index():
 
 @students_bp.get("/<student_no>/transcript")
 def transcript(student_no):
-    result = get_transcript(student_no)
+    rule_name = request.args.get("rule")
+    result = get_transcript(student_no, rule_name=rule_name)
     if not result:
         return jsonify({"message": "未找到该学生成绩"}), 404
     return jsonify(result)
